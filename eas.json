@@ -3,9 +3,6 @@
     "preview": {
       "android": {
         "buildType": "apk"
-      },
-      "env": {
-        "EAS_NO_FREEZE": "1"
       }
     }
   }
