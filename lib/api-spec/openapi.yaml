@@ -1,22 +1,39 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Telegram Clone API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: users
+    description: User management
+  - name: chats
+    description: Chat management
+  - name: messages
+    description: Messages
+  - name: files
+    description: File uploads
+  - name: stars
+    description: Stars (virtual currency)
+  - name: premium
+    description: TG Premium
+  - name: stickers
+    description: Stickers and custom emoji
+  - name: admin
+    description: Admin panel
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +41,434 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/me:
+    get:
+      operationId: getMe
+      tags: [users]
+      summary: Get current user
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/me/settings:
+    put:
+      operationId: updateSettings
+      tags: [users]
+      summary: Update user settings (theme, font size)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSettingsRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/search:
+    get:
+      operationId: searchUsers
+      tags: [users]
+      summary: Search users by username
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /users/{userId}:
+    get:
+      operationId: getUserById
+      tags: [users]
+      summary: Get user by ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /chats:
+    get:
+      operationId: getChats
+      tags: [chats]
+      summary: Get all chats for current user
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Chat"
+    post:
+      operationId: createChat
+      tags: [chats]
+      summary: Create a new chat (DM, group, or channel)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateChatRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chat"
+
+  /chats/{chatId}:
+    get:
+      operationId: getChatById
+      tags: [chats]
+      summary: Get chat by ID
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chat"
+
+  /chats/{chatId}/members:
+    get:
+      operationId: getChatMembers
+      tags: [chats]
+      summary: Get chat members
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      operationId: addChatMember
+      tags: [chats]
+      summary: Add member to chat
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+              required: [userId]
+      responses:
+        "200":
+          description: Success
+
+  /messages/{chatId}:
+    get:
+      operationId: getMessages
+      tags: [messages]
+      summary: Get messages for a chat
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      operationId: sendMessage
+      tags: [messages]
+      summary: Send a message
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  /messages/{chatId}/{messageId}:
+    delete:
+      operationId: deleteMessage
+      tags: [messages]
+      summary: Delete a message
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Success
+
+  /files/upload:
+    post:
+      operationId: uploadFile
+      tags: [files]
+      summary: Upload a file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required: [file]
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileUploadResponse"
+
+  /stars/balance:
+    get:
+      operationId: getStarsBalance
+      tags: [stars]
+      summary: Get star balance
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StarsBalance"
+
+  /stars/purchase-premium:
+    post:
+      operationId: purchasePremium
+      tags: [premium]
+      summary: Purchase premium with stars
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Not enough stars
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /stickers:
+    get:
+      operationId: getStickers
+      tags: [stickers]
+      summary: Get user sticker packs
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StickerPack"
+    post:
+      operationId: createStickerPack
+      tags: [stickers]
+      summary: Create a sticker pack
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStickerPackRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StickerPack"
+
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+              required: [password]
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                required: [token]
+        "401":
+          description: Unauthorized
+
+  /admin/stars:
+    post:
+      operationId: adminModifyStars
+      tags: [admin]
+      summary: Add or remove stars for user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminModifyStarsRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +476,261 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        displayName:
+          type: string
+        password:
+          type: string
+        bio:
+          type: string
+      required: [username, displayName, password]
+
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required: [username, password]
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+      required: [token, user]
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        displayName:
+          type: string
+        bio:
+          type: string
+        avatarUrl:
+          type: string
+        isPremium:
+          type: boolean
+        premiumExpiresAt:
+          type: string
+        emojiStatus:
+          type: string
+        stars:
+          type: integer
+        theme:
+          type: string
+        fontSize:
+          type: string
+        createdAt:
+          type: string
+      required: [id, username, displayName, isPremium, stars]
+
+    UpdateSettingsRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+        bio:
+          type: string
+        theme:
+          type: string
+        fontSize:
+          type: string
+        emojiStatus:
+          type: string
+
+    Chat:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [dm, group, channel]
+        name:
+          type: string
+        description:
+          type: string
+        avatarUrl:
+          type: string
+        memberCount:
+          type: integer
+        lastMessage:
+          $ref: "#/components/schemas/Message"
+        unreadCount:
+          type: integer
+        createdAt:
+          type: string
+        otherUserId:
+          type: integer
+        otherUser:
+          $ref: "#/components/schemas/User"
+      required: [id, type, memberCount, createdAt]
+
+    CreateChatRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [dm, group, channel]
+        name:
+          type: string
+        description:
+          type: string
+        memberIds:
+          type: array
+          items:
+            type: integer
+        targetUserId:
+          type: integer
+      required: [type]
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+        chatId:
+          type: integer
+        senderId:
+          type: integer
+        sender:
+          $ref: "#/components/schemas/User"
+        type:
+          type: string
+          enum: [text, image, file, voice, sticker]
+        content:
+          type: string
+        fileUrl:
+          type: string
+        fileName:
+          type: string
+        fileSize:
+          type: integer
+        duration:
+          type: integer
+        replyToId:
+          type: integer
+        replyTo:
+          $ref: "#/components/schemas/Message"
+        isDeleted:
+          type: boolean
+        createdAt:
+          type: string
+      required: [id, chatId, senderId, type, createdAt]
+
+    SendMessageRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [text, image, file, voice, sticker]
+        content:
+          type: string
+        fileUrl:
+          type: string
+        fileName:
+          type: string
+        fileSize:
+          type: integer
+        duration:
+          type: integer
+        replyToId:
+          type: integer
+      required: [type]
+
+    FileUploadResponse:
+      type: object
+      properties:
+        url:
+          type: string
+        fileName:
+          type: string
+        fileSize:
+          type: integer
+        mimeType:
+          type: string
+      required: [url, fileName, fileSize, mimeType]
+
+    StarsBalance:
+      type: object
+      properties:
+        stars:
+          type: integer
+      required: [stars]
+
+    StickerPack:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        stickers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Sticker"
+        createdAt:
+          type: string
+      required: [id, name, stickers, createdAt]
+
+    Sticker:
+      type: object
+      properties:
+        id:
+          type: integer
+        packId:
+          type: integer
+        imageUrl:
+          type: string
+        emoji:
+          type: string
+      required: [id, packId, imageUrl]
+
+    CreateStickerPackRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        stickers:
+          type: array
+          items:
+            type: object
+            properties:
+              imageUrl:
+                type: string
+              emoji:
+                type: string
+            required: [imageUrl]
+      required: [name, stickers]
+
+    AdminModifyStarsRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        amount:
+          type: integer
+        adminToken:
+          type: string
+      required: [username, amount, adminToken]
