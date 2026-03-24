@@ -3,10 +3,9 @@
   "version": "1.0.1",
   "license": "MIT",
   "scripts": {
-    "preinstall": "npx only-allow npm",
-    "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "build": "run typecheck && -r --if-present run build",
     "typecheck:libs": "tsc --build",
-    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
+    "typecheck": "run typecheck:libs && -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
   },
   "private": true,
   "devDependencies": {
