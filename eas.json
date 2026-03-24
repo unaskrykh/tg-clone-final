@@ -3,6 +3,9 @@
     "preview": {
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "YARN_BASED_PROJECT": "true"
       }
     }
   }
