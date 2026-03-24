@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "license": "MIT",
   "scripts": {
+    "eas-build-pre-install": "rm -f yarn.lock && yarn install --no-frozen-lockfile",
     "build": "run typecheck && -r --if-present run build",
     "typecheck:libs": "tsc --build",
     "typecheck": "run typecheck:libs && -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"

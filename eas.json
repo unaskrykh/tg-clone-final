@@ -3,8 +3,7 @@
     "preview": {
       "android": {
         "buildType": "apk"
-      },
-      "preInstall": "yarn install --no-frozen-lockfile"
+      }
     }
   }
 }
