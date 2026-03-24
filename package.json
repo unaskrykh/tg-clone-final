@@ -15,5 +15,6 @@
   },
   "dependencies": {
     "expo": "^55.0.8"
-  }
+  },
+  "main": "node_modules/expo/AppEntry.js"
 }
