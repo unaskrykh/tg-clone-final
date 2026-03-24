@@ -1,25 +1,35 @@
 {
   "expo": {
-    "name": "sfbc",
-    "slug": "sfbc",
-    "version": "1.0.1",
+    "name": "Telegram Replica",
+    "slug": "tg-clone-final",
+    "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "light",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "package": "com.unaskrykh.workspace"
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.unaskrykh.tgclone2"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
     },
     "extra": {
       "eas": {
-        "projectId": "700c67c7-cba9-4276-8cc0-49a642d2b149"
+        "projectId": "fd66b53d-3abb-4728-862a-6a6e9a2b7dca"
       }
     }
   }
