@@ -1,6 +1,6 @@
 {
-  "name": "workspace",
-  "version": "0.0.0",
+  "name": "tg-clone-final-apk",
+  "version": "1.0.1",
   "license": "MIT",
   "scripts": {
     "preinstall": "npx only-allow npm",
