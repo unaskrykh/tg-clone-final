@@ -4,9 +4,7 @@
       "android": {
         "buildType": "apk"
       },
-      "env": {
-        "YARN_BASED_PROJECT": "true"
-      }
+      "preInstall": "yarn install --no-frozen-lockfile"
     }
   }
 }
